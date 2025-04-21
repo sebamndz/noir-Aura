@@ -1,0 +1,12 @@
+#featured-products {
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: space-between;
+    }
+    .col-md-4 {
+      flex: 1 1 calc(33% - 20px);  // Tres productos por fila
+      max-width: calc(33% - 20px);
+    }
+  }

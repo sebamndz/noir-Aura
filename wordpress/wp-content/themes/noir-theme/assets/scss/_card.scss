@@ -1,0 +1,44 @@
+.card {
+    background-color: $background-dark;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-10px); // Efecto de elevación al pasar el mouse
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .card-img-top {
+    object-fit: cover;
+    height: 200px;
+  }
+  
+  .card-body {
+    background-color: $background-light;
+  }
+  
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .card-text {
+    color: #ccc;
+  }
+  
+  .card-text.price {
+    color: $primary-color;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .card-text.description {
+    font-size: 0.9rem;
+    color: #aaa;
+  }
+  
