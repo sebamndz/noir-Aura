@@ -27,12 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         const categorias = data.data.categoriaProductos.nodes;
   
-        // Agregar opción por defecto
-        const optionDefault = document.createElement('option');
-        optionDefault.value = '';
-        optionDefault.textContent = 'Todas las categorías';
-        categoriaSelect.appendChild(optionDefault);
-  
         categorias.forEach(categoria => {
           const option = document.createElement('option');
           option.value = categoria.slug;
