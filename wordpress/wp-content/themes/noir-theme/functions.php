@@ -79,7 +79,6 @@ function noir_aura_register_product_category_taxonomy() {
         'show_in_rest' => true, // Habilitar soporte para REST API (GraphQL)
         'show_admin_column' => true,
         'query_var' => true,
-        'rewrite' => array('slug' => 'categoria-producto'), // URL amigable
         'capability_type' => 'post',
         'show_in_graphql' => true, // Habilitar soporte para GraphQL
         'graphql_single_name' => 'CategoriaProducto', // Nombre singular para GraphQL
