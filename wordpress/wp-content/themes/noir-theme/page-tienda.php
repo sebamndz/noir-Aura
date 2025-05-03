@@ -10,7 +10,6 @@ get_header(); ?>
     <div class="col-md-6 offset-md-3">
       <select id="categoriaFiltro" class="form-select">
         <option value="">Todas las categorías</option>
-        <!-- Opciones agregadas con JS -->
       </select>
     </div>
   </div>
@@ -20,8 +19,5 @@ get_header(); ?>
     <p class="text-center">Cargando productos...</p>
   </div>
 </div>
-
-<!-- Script para GraphQL -->
-<script src="<?php echo get_template_directory_uri(); ?>/assets/js/filtro.js"></script>
 
 <?php get_footer(); ?>

@@ -5,13 +5,19 @@ require get_template_directory() . '/assets/inc/walker-menu.php';
 function noir_aura_enqueue_assets() {
   // CSS local
   wp_enqueue_style('bootstrap-css', get_template_directory_uri() . '/assets/bootstrap-5.3.5-dist/css/bootstrap.min.css', [], '5.3.3');
-  wp_enqueue_style('noir-aura-style', get_template_directory_uri() . '/assets/css/style.css', [], '1.0');
+  wp_enqueue_style('noir-aura-style', get_template_directory_uri() . '/assets/css/style.css', [], '1.0.1');
 
   // JS local
   wp_enqueue_script('bootstrap-js', get_template_directory_uri() . '/assets/bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js', [], '5.3.3', true);
-  wp_enqueue_script('noir-aura-main', get_template_directory_uri() . '/assets/js/main.js', [], '1.0', true);
+  wp_enqueue_script('noir-aura-main', get_template_directory_uri() . '/assets/js/main.js', [], '1.0.1', true);
+  wp_enqueue_script('noir-aura-filtro', get_template_directory_uri() . '/assets/js/filtro.js', [], '1.0.1', true);
 }
 add_action('wp_enqueue_scripts', 'noir_aura_enqueue_assets');
+
+function cargar_jquery() {
+    wp_enqueue_script('jquery');
+}
+add_action('wp_enqueue_scripts', 'cargar_jquery');
 
 // Soporte adicional
 add_theme_support('post-thumbnails');
