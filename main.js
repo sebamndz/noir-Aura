@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const JSON_URL = "./productos.json"; // debe estar en la misma carpeta
+  const JSON_URL = "./productos.json"; // mismo nivel que index.html
 
   function render(productos) {
     container.innerHTML = "";
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔥 CARGA FORZADA DESDE JSON
+  // CARGA FORZADA DESDE JSON
   fetch(JSON_URL)
     .then((res) => {
       console.log("Intentando cargar:", JSON_URL, res.status);
