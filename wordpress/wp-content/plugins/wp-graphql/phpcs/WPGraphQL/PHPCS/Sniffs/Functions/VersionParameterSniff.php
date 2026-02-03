@@ -35,9 +35,7 @@ class VersionParameterSniff implements Sniff
      * @var array<string>
      */
     private $validPlaceholders = [
-        '@since next-version',
-        '@since todo',
-        '@next-version',
+        'x-release-please-version',
     ];
 
     public function __construct()
@@ -108,25 +106,13 @@ class VersionParameterSniff implements Sniff
 
         // Check if it's a valid placeholder
         if (in_array($version, $this->validPlaceholders, true)) {
-            if ($version !== '@since next-version') {
-                $fix = $phpcsFile->addFixableWarning(
-                    'Please use "@since next-version" instead of "%s"',
-                    $parameters[$paramPosition - 1]['start'],
-                    'OldVersionPlaceholder',
-                    [$version]
-                );
-
-                if ($fix === true) {
-                    return $this->fixVersionParameter($phpcsFile, $parameters[$paramPosition - 1]);
-                }
-            }
             return;
         }
 
         // Validate semver
         if (!$this->isValidSemver($version)) {
             $fix = $phpcsFile->addFixableError(
-                'Invalid version "%s" in %s(). Must be a valid semver version or "@since next-version"',
+                'Invalid version "%s" in %s(). Must be a valid semver version or "x-release-please-version"',
                 $parameters[$paramPosition - 1]['start'],
                 'InvalidVersion',
                 [$version, $functionName]
@@ -232,7 +218,7 @@ class VersionParameterSniff implements Sniff
         }
 
         $phpcsFile->fixer->beginChangeset();
-        $phpcsFile->fixer->replaceToken($parameter['start'], "'@since next-version'");
+        $phpcsFile->fixer->replaceToken($parameter['start'], "'x-release-please-version'");
 
         // Clear any remaining tokens
         for ($i = $parameter['start'] + 1; $i <= $parameter['end']; $i++) {

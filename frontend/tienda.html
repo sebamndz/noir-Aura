@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOIR AURA – Tienda</title>
+
+  <!-- Bootstrap (CDN) -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+  />
+
+  <!-- Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body class="bg-black text-white">
+
+  <!-- HEADER / NAV -->
+  <header class="bg-dark text-white">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container flex-column">
+
+        <a class="navbar-brand mx-auto fs-3 text-decoration-none" href="./index.html">NOIR AURA</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+          aria-controls="menuPrincipal" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-center" id="menuPrincipal">
+          <ul class="navbar-nav text-center">
+            <li class="nav-item"><a class="nav-link" href="./index.html">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link active" href="./tienda.html">Tienda</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO TIENDA -->
+  <section class="py-5 border-bottom border-secondary">
+    <div class="container text-center">
+      <h1 class="fw-bold mb-2">Tienda</h1>
+      <p class="text-muted mb-0">Explora la colección y filtra por categoría</p>
+    </div>
+  </section>
+
+  <!-- FILTRO + GRID -->
+  <main class="py-5">
+    <div class="container">
+
+      <!-- Filtro -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-5 col-lg-4">
+          <label for="categoriaFiltro" class="form-label">Categoría</label>
+          <select id="categoriaFiltro" class="form-select bg-dark text-white border-secondary">
+            <option value="">Todas</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Productos -->
+      <div id="productos" class="row g-4">
+        <!-- Cards inyectadas por filtro.js -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="py-4 border-top border-secondary mt-5">
+    <div class="container text-center">
+      <p class="m-0 text-muted">
+        &copy; <span id="year"></span> NOIR AURA. Demo para portafolio.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- jQuery (necesario para tu filtro.js actual) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- Scripts del proyecto -->
+  <script src="./filtro.js"></script>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

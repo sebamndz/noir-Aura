@@ -49,25 +49,6 @@ class DataSource {
 	 */
 	protected static $node_definition;
 
-	/**
-	 * Retrieves a WP_Comment object for the id that gets passed
-	 *
-	 * @param int                   $id      ID of the comment we want to get the object for.
-	 * @param \WPGraphQL\AppContext $context The context of the request.
-	 *
-	 * @return \GraphQL\Deferred object
-	 * @throws \GraphQL\Error\UserError Throws UserError.
-	 * @throws \Exception Throws UserError.
-	 *
-	 * @since 0.0.5
-	 *
-	 * @deprecated Use the Loader passed in $context instead
-	 */
-	public static function resolve_comment( $id, $context ) {
-		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'comment\' )->load_deferred( $id ) instead.' );
-
-		return $context->get_loader( 'comment' )->load_deferred( $id );
-	}
 
 	/**
 	 * Retrieves a WP_Comment object for the ID that gets passed
@@ -119,39 +100,6 @@ class DataSource {
 	}
 
 	/**
-	 * Returns the post object for the ID and post type passed
-	 *
-	 * @param int                   $id      ID of the post you are trying to retrieve
-	 * @param \WPGraphQL\AppContext $context The context of the GraphQL Request
-	 *
-	 * @return \GraphQL\Deferred
-	 *
-	 * @throws \GraphQL\Error\UserError
-	 * @throws \Exception
-	 *
-	 * @since      0.0.5
-	 * @deprecated Use the Loader passed in $context instead
-	 */
-	public static function resolve_post_object( int $id, AppContext $context ) {
-		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'post\' )->load_deferred( $id ) instead.' );
-		return $context->get_loader( 'post' )->load_deferred( $id );
-	}
-
-	/**
-	 * @param int                   $id      The ID of the menu item to load
-	 * @param \WPGraphQL\AppContext $context The context of the GraphQL request
-	 *
-	 * @return \GraphQL\Deferred|null
-	 * @throws \Exception
-	 *
-	 * @deprecated Use the Loader passed in $context instead
-	 */
-	public static function resolve_menu_item( int $id, AppContext $context ) {
-		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'post\' )->load_deferred( $id ) instead.' );
-		return $context->get_loader( 'post' )->load_deferred( $id );
-	}
-
-	/**
 	 * Wrapper for PostObjectsConnectionResolver
 	 *
 	 * @param mixed                                $source    The object the connection is coming from
@@ -199,23 +147,6 @@ class DataSource {
 		}
 
 		return new Taxonomy( $tax_object );
-	}
-
-	/**
-	 * Get the term object for a term
-	 *
-	 * @param int                   $id      ID of the term you are trying to retrieve the object for
-	 * @param \WPGraphQL\AppContext $context The context of the GraphQL Request
-	 *
-	 * @return \GraphQL\Deferred
-	 * @throws \Exception
-	 * @since      0.0.5
-	 *
-	 * @deprecated Use the Loader passed in $context instead
-	 */
-	public static function resolve_term_object( $id, AppContext $context ) {
-		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'term\' )->load_deferred( $id ) instead.' );
-		return $context->get_loader( 'term' )->load_deferred( $id );
 	}
 
 	/**
@@ -271,23 +202,6 @@ class DataSource {
 	public static function resolve_themes_connection( $source, array $args, AppContext $context, ResolveInfo $info ) {
 		$resolver = new ThemeConnectionResolver( $source, $args, $context, $info );
 		return $resolver->get_connection();
-	}
-
-	/**
-	 * Gets the user object for the user ID specified
-	 *
-	 * @param int                   $id      ID of the user you want the object for
-	 * @param \WPGraphQL\AppContext $context The AppContext
-	 *
-	 * @return \GraphQL\Deferred
-	 * @throws \Exception
-	 *
-	 * @since      0.0.5
-	 * @deprecated Use the Loader passed in $context instead
-	 */
-	public static function resolve_user( $id, AppContext $context ) {
-		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'user\' )->load_deferred( $id ) instead.' );
-		return $context->get_loader( 'user' )->load_deferred( $id );
 	}
 
 	/**
@@ -438,11 +352,13 @@ class DataSource {
 		$allowed_settings_by_group = [];
 		foreach ( $registered_settings as $key => $setting ) {
 			// Bail if the setting doesn't have a group.
-			if ( empty( $setting['group'] ) ) {
+			if ( ! isset( $setting['group'] ) || empty( $setting['group'] ) ) {
 				continue;
 			}
 
-			$group = self::format_group_name( $setting['group'] );
+			/** @var string $setting_group */
+			$setting_group = $setting['group'];
+			$group         = self::format_group_name( $setting_group );
 
 			if ( ! isset( $setting['type'] ) || ! $type_registry->get_type( $setting['type'] ) ) {
 				continue;
@@ -467,7 +383,7 @@ class DataSource {
 		/**
 		 * Filter the $allowed_settings_by_group to allow enabling or disabling groups in the GraphQL Schema.
 		 *
-		 * @param array<string,array<string,mixed>> $allowed_settings_by_group
+		 * @since 0.0.1
 		 */
 		return apply_filters( 'graphql_allowed_settings_by_group', $allowed_settings_by_group );
 	}
@@ -523,7 +439,7 @@ class DataSource {
 		 * Filter the $allowed_settings to allow some to be enabled or disabled from showing in
 		 * the GraphQL Schema.
 		 *
-		 * @param array<string,array<string,mixed>> $allowed_settings
+		 * @since 0.0.1
 		 */
 		return apply_filters( 'graphql_allowed_setting_groups', $allowed_settings );
 	}
@@ -659,7 +575,7 @@ class DataSource {
 	 * @param \WPGraphQL\AppContext                $context The Context of the GraphQL Request
 	 * @param \GraphQL\Type\Definition\ResolveInfo $info The ResolveInfo for the GraphQL Request
 	 *
-	 * @return string|null
+	 * @return ?\GraphQL\Deferred
 	 * @throws \GraphQL\Error\UserError If no ID is passed.
 	 */
 	public static function resolve_node( $global_id, AppContext $context, ResolveInfo $info ) {
@@ -675,29 +591,28 @@ class DataSource {
 		$id_components = Relay::fromGlobalId( $global_id );
 
 		/**
-		 * If the $id_components is a proper array with a type and id
+		 * $id_components is an array with the id and type
 		 *
 		 * @since 0.0.5
 		 */
-		if ( is_array( $id_components ) && ! empty( $id_components['id'] ) && ! empty( $id_components['type'] ) ) {
-
-			/**
-			 * Get the allowed_post_types and allowed_taxonomies
-			 *
-			 * @since 0.0.5
-			 */
-
-			$loader = $context->get_loader( $id_components['type'] );
-
-			if ( $loader ) {
-				return $loader->load_deferred( $id_components['id'] );
-			}
-
-			return null;
-		} else {
+		if ( empty( $id_components['id'] ) || empty( $id_components['type'] ) ) {
 			// translators: %s is the global ID.
 			throw new UserError( esc_html( sprintf( __( 'The global ID isn\'t recognized ID: %s', 'wp-graphql' ), $global_id ) ) );
 		}
+
+		/**
+		 * Get the allowed_post_types and allowed_taxonomies
+		 *
+		 * @since 0.0.5
+		 */
+
+		$loader = $context->get_loader( $id_components['type'] );
+
+		if ( $loader ) {
+			return $loader->load_deferred( $id_components['id'] );
+		}
+
+		return null;
 	}
 
 	/**
@@ -727,5 +642,129 @@ class DataSource {
 		$node_resolver = new NodeResolver( $context );
 
 		return $node_resolver->resolve_uri( $uri );
+	}
+
+	/**
+	 * @todo remove in 3.0.0
+	 * @deprecated Use the Loader passed in $context instead
+	 * @codeCoverageIgnore
+	 *
+	 * @param int                   $id      ID of the comment we want to get the object for.
+	 * @param \WPGraphQL\AppContext $context The context of the request.
+	 *
+	 * @return \GraphQL\Deferred object
+	 * @throws \GraphQL\Error\UserError Throws UserError.
+	 * @throws \Exception Throws UserError.
+	 */
+	public static function resolve_comment( $id, $context ) {
+		_doing_it_wrong(
+			__METHOD__,
+			sprintf(
+				/* translators: %s is the method name */
+				esc_html__( 'This method will be removed in the next major release. Use %s instead.', 'wp-graphql' ),
+				'$context->get_loader( \'comment\' )->load_deferred( $id )'
+			),
+			'0.8.4'
+		);
+
+		return $context->get_loader( 'comment' )->load_deferred( $id );
+	}
+
+	/**
+	 * @todo remove in 3.0.0
+	 * @deprecated Use the Loader passed in $context instead
+	 * @codeCoverageIgnore
+	 *
+	 * @param int                   $id      ID of the post you are trying to retrieve
+	 * @param \WPGraphQL\AppContext $context The context of the GraphQL Request
+	 *
+	 * @return \GraphQL\Deferred
+	 *
+	 * @throws \GraphQL\Error\UserError
+	 * @throws \Exception
+	 */
+	public static function resolve_post_object( int $id, AppContext $context ) {
+		_doing_it_wrong(
+			__METHOD__,
+			sprintf(
+				/* translators: %s is the method name */
+				esc_html__( 'This method will be removed in the next major release. Use %s instead.', 'wp-graphql' ),
+				'$context->get_loader( \'post\' )->load_deferred( $id )'
+			),
+			'0.8.4'
+		);
+		return $context->get_loader( 'post' )->load_deferred( $id );
+	}
+
+	/**
+	 * @todo remove in 3.0.0
+	 * @deprecated Use the Loader passed in $context instead
+	 * @codeCoverageIgnore
+	 *
+	 * @param int                   $id      The ID of the menu item to load
+	 * @param \WPGraphQL\AppContext $context The context of the GraphQL request
+	 *
+	 * @return \GraphQL\Deferred|null
+	 * @throws \Exception
+	 */
+	public static function resolve_menu_item( int $id, AppContext $context ) {
+		_doing_it_wrong(
+			__METHOD__,
+			sprintf(
+				/* translators: %s is the method name */
+				esc_html__( 'This method will be removed in the next major release. Use %s instead.', 'wp-graphql' ),
+				'$context->get_loader( \'menu_item\' )->load_deferred( $id )'
+			),
+			'0.8.4'
+		);
+		return $context->get_loader( 'post' )->load_deferred( $id );
+	}
+
+	/**
+	 * @todo remove in 3.0.0
+	 * @deprecated Use the Loader passed in $context instead
+	 * @codeCoverageIgnore
+	 *
+	 * @param int                   $id      ID of the term you are trying to retrieve the object for
+	 * @param \WPGraphQL\AppContext $context The context of the GraphQL Request
+	 *
+	 * @return \GraphQL\Deferred
+	 * @throws \Exception
+	 */
+	public static function resolve_term_object( $id, AppContext $context ) {
+		_doing_it_wrong(
+			__METHOD__,
+			sprintf(
+				/* translators: %s is the method name */
+				esc_html__( 'This method will be removed in the next major release. Use %s instead.', 'wp-graphql' ),
+				'$context->get_loader( \'term\' )->load_deferred( $id )'
+			),
+			'0.8.4'
+		);
+		return $context->get_loader( 'term' )->load_deferred( $id );
+	}
+
+	/**
+	 * @todo remove in 3.0.0
+	 * @deprecated Use the Loader passed in $context instead
+	 * @codeCoverageIgnore
+	 *
+	 * @param int                   $id      ID of the user you want the object for
+	 * @param \WPGraphQL\AppContext $context The AppContext
+	 *
+	 * @return \GraphQL\Deferred
+	 * @throws \Exception
+	 */
+	public static function resolve_user( $id, AppContext $context ) {
+		_doing_it_wrong(
+			__METHOD__,
+			sprintf(
+				/* translators: %s is the method name */
+				esc_html__( 'This method will be removed in the next major release. Use %s instead.', 'wp-graphql' ),
+				'$context->get_loader( \'user\' )->load_deferred( $id )'
+			),
+			'0.8.4'
+		);
+		return $context->get_loader( 'user' )->load_deferred( $id );
 	}
 }

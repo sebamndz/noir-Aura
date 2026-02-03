@@ -38,7 +38,7 @@ function obtenerJWTokens($usuario, $password) {
 
 // Datos de autenticación
 $user = 'sebamndz';
-$pass = '4o4ILbY3OwFUkf&@mb';
+$pass = 'Qu3n0s3t30lvid3';
 
 // Obtener el token
 $token = obtenerJWTokens($user, $pass);

@@ -5,7 +5,7 @@
   <div class="container py-5">
     <h2 class="display-4 fw-bold">Estilo Oscuro. Esencia Única.</h2>
     <p class="lead">Descubre la nueva colección de NOIR AURA</p>
-    <a href="#" class="btn btn-outline-light mt-3">Ver Colección</a>
+    <a href="tienda" class="btn btn-outline-light mt-3">Ver Colección</a>
   </div>
 </section>
 

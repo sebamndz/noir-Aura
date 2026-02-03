@@ -120,19 +120,10 @@ class ReferenceExecutor implements ExecutorImplementation
         );
 
         if (is_array($exeContext)) {
-            return new class($promiseAdapter->createFulfilled(new ExecutionResult(null, $exeContext))) implements ExecutorImplementation {
-                private Promise $result;
+            $executionResult = new ExecutionResult(null, $exeContext);
+            $fulfilledPromise = $promiseAdapter->createFulfilled($executionResult);
 
-                public function __construct(Promise $result)
-                {
-                    $this->result = $result;
-                }
-
-                public function doExecute(): Promise
-                {
-                    return $this->result;
-                }
-            };
+            return new PromiseExecutor($fulfilledPromise);
         }
 
         return new static($exeContext);
@@ -337,7 +328,7 @@ class ReferenceExecutor implements ExecutorImplementation
         if ($error instanceof Error) {
             $this->exeContext->addError($error);
 
-            return $this->exeContext->promiseAdapter->createFulfilled(null);
+            return $this->exeContext->promiseAdapter->createFulfilled();
         }
 
         return null;
@@ -393,10 +384,10 @@ class ReferenceExecutor implements ExecutorImplementation
      *
      * @phpstan-param Fields $fields
      *
-     * @phpstan-return Fields
-     *
      * @throws \Exception
      * @throws Error
+     *
+     * @phpstan-return Fields
      */
     protected function collectFields(
         ObjectType $runtimeType,
@@ -596,11 +587,10 @@ class ReferenceExecutor implements ExecutorImplementation
      * @param list<string|int> $path
      * @param list<string|int> $unaliasedPath
      * @param mixed $contextValue
+     * @param \ArrayObject<int, FieldNode> $fieldNodes
      *
      * @phpstan-param Path                $path
      * @phpstan-param Path                $unaliasedPath
-     *
-     * @param \ArrayObject<int, FieldNode> $fieldNodes
      *
      * @throws Error
      * @throws InvariantViolation
@@ -765,11 +755,10 @@ class ReferenceExecutor implements ExecutorImplementation
      * @param list<string|int> $path
      * @param list<string|int> $unaliasedPath
      * @param mixed $contextValue
+     * @param mixed $result
      *
      * @phpstan-param Path                $path
      * @phpstan-param Path                $unaliasedPath
-     *
-     * @param mixed $result
      *
      * @throws Error
      *
@@ -875,7 +864,7 @@ class ReferenceExecutor implements ExecutorImplementation
         ResolveInfo $info,
         array $path,
         array $unaliasedPath,
-        &$result,
+        $result,
         $contextValue
     ) {
         // If result is an Error, throw a located error.
@@ -1018,7 +1007,7 @@ class ReferenceExecutor implements ExecutorImplementation
         ResolveInfo $info,
         array $path,
         array $unaliasedPath,
-        iterable &$results,
+        iterable $results,
         $contextValue
     ) {
         $itemType = $returnType->getWrappedType();
@@ -1056,7 +1045,7 @@ class ReferenceExecutor implements ExecutorImplementation
      *
      * @return mixed
      */
-    protected function completeLeafValue(LeafType $returnType, &$result)
+    protected function completeLeafValue(LeafType $returnType, $result)
     {
         try {
             return $returnType->serialize($result);
@@ -1075,7 +1064,7 @@ class ReferenceExecutor implements ExecutorImplementation
      * @param \ArrayObject<int, FieldNode> $fieldNodes
      * @param list<string|int> $path
      * @param list<string|int> $unaliasedPath
-     * @param array<mixed> $result
+     * @param mixed $result
      * @param mixed $contextValue
      *
      * @throws \Exception
@@ -1090,9 +1079,10 @@ class ReferenceExecutor implements ExecutorImplementation
         ResolveInfo $info,
         array $path,
         array $unaliasedPath,
-        &$result,
+        $result,
         $contextValue
     ) {
+        $result = $returnType->resolveValue($result, $contextValue, $info);
         $typeCandidate = $returnType->resolveType($result, $contextValue, $info);
 
         if ($typeCandidate === null) {
@@ -1223,7 +1213,7 @@ class ReferenceExecutor implements ExecutorImplementation
         ResolveInfo $info,
         array $path,
         array $unaliasedPath,
-        &$result,
+        $result,
         $contextValue
     ) {
         // If there is an isTypeOf predicate function, call it with the
@@ -1239,7 +1229,7 @@ class ReferenceExecutor implements ExecutorImplementation
                     $fieldNodes,
                     $path,
                     $unaliasedPath,
-                    &$result
+                    $result
                 ) {
                     if (! $isTypeOfResult) {
                         throw $this->invalidReturnTypeError($returnType, $result, $fieldNodes);
@@ -1274,7 +1264,7 @@ class ReferenceExecutor implements ExecutorImplementation
 
     /**
      * @param \ArrayObject<int, FieldNode> $fieldNodes
-     * @param array<mixed> $result
+     * @param mixed $result
      */
     protected function invalidReturnTypeError(
         ObjectType $returnType,
@@ -1306,7 +1296,7 @@ class ReferenceExecutor implements ExecutorImplementation
         \ArrayObject $fieldNodes,
         array $path,
         array $unaliasedPath,
-        &$result,
+        $result,
         $contextValue
     ) {
         $subFieldNodes = $this->collectSubFields($returnType, $fieldNodes);
@@ -1321,10 +1311,10 @@ class ReferenceExecutor implements ExecutorImplementation
      *
      * @param \ArrayObject<int, FieldNode> $fieldNodes
      *
-     * @phpstan-return Fields
-     *
      * @throws \Exception
      * @throws Error
+     *
+     * @phpstan-return Fields
      */
     protected function collectSubFields(ObjectType $returnType, \ArrayObject $fieldNodes): \ArrayObject
     {
@@ -1410,7 +1400,7 @@ class ReferenceExecutor implements ExecutorImplementation
      *
      * @param array<mixed>|mixed $results
      *
-     * @return array<mixed>|\stdClass|mixed
+     * @return non-empty-array<mixed>|\stdClass|mixed
      */
     protected static function fixResultsIfEmptyArray($results)
     {
@@ -1454,7 +1444,7 @@ class ReferenceExecutor implements ExecutorImplementation
         $runtimeTypeOrName,
         AbstractType $returnType,
         ResolveInfo $info,
-        &$result
+        $result
     ): ObjectType {
         $runtimeType = is_string($runtimeTypeOrName)
             ? $this->exeContext->schema->getType($runtimeTypeOrName)

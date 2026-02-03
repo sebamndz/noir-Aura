@@ -15,7 +15,7 @@ get_header(); ?>
   </div>
 
   <!-- Productos cargados dinámicamente -->
-  <div class="row" id="productos">
+  <div class="row" id="productosContainer">
     <p class="text-center">Cargando productos...</p>
   </div>
 </div>

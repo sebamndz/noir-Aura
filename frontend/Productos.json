@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "black-hoodie",
+    "titulo": "Black Hoodie Noir",
+    "descripcion": "Hoodie premium en algodón pesado, fit oversized.",
+    "precio": "39.990",
+    "categoria": "hoodies",
+    "imagen": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990"
+  },
+  {
+    "slug": "dark-jacket",
+    "titulo": "Dark Jacket",
+    "descripcion": "Chaqueta urbana estilo minimal, color negro mate.",
+    "precio": "59.990",
+    "categoria": "jackets",
+    "imagen": "https://images.unsplash.com/photo-1520975922284-7bcd0a7f8b2c"
+  },
+  {
+    "slug": "noir-cap",
+    "titulo": "Noir Cap",
+    "descripcion": "Gorro urbano de tiro corto, bordado minimal.",
+    "precio": "14.990",
+    "categoria": "accesorios",
+    "imagen": "https://images.unsplash.com/photo-1593032457866-8f05c9b4a4f3"
+  },
+  {
+    "slug": "oversize-tee",
+    "titulo": "Oversize Tee",
+    "descripcion": "Polera oversize algodón 240gsm.",
+    "precio": "19.990",
+    "categoria": "poleras",
+    "imagen": "https://images.unsplash.com/photo-1520974735194-6b42bfcf1a47"
+  },
+  {
+    "slug": "cargo-pants",
+    "titulo": "Cargo Pants",
+    "descripcion": "Pantalón cargo corte recto, múltiples bolsillos.",
+    "precio": "44.990",
+    "categoria": "pantalones",
+    "imagen": "https://images.unsplash.com/photo-1620799139507-7c0f2f58cfa6"
+  },
+  {
+    "slug": "silver-chain",
+    "titulo": "Silver Chain",
+    "descripcion": "Cadena plateada estilo streetwear.",
+    "precio": "12.990",
+    "categoria": "accesorios",
+    "imagen": "https://images.unsplash.com/photo-1611095973362-88e0c61fbbfa"
+  }
+]

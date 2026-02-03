@@ -1,121 +1,92 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const endpoint = "http://localhost/noir-aura/wordpress/graphql";
-    const container = document.getElementById("featured-products");
+  const endpoint = "http://localhost/noir-aura/wordpress/graphql";
+  
+  const container = document.getElementById("featured-products");
 
-    const query = `
+  // Si no existe el contenedor en esta página, sal sin error
+  if (!container) return;
+
+  const query = `
     query {
-        categoriaProductos {
-            nodes {
-                name
+      productos(first: 100) {
+        nodes {
+          title
+          slug
+          featuredImage {
+            node {
+              sourceUrl
+              altText
             }
-        }
-        productos {
-            nodes {
-                title
-                slug
-                featuredImage {
-                    node {
-                        sourceUrl
-                        altText
-                    }
-                }
-                camposParaProducto {
-                    titulo
-                    descripcion
-                    precio
-                    imagen {
-                        node {
-                            sourceUrl
-                            altText
-                        }
-                    }
-                }
+          }
+          camposparaproducto {
+            titulo
+            descripcion
+            precio
+            imagen {
+              node {
+                sourceUrl
+                altText
+              }
             }
+          }
         }
-    }`;
+      }
+    }
+  `;
 
-    // Fetch para obtener productos
-    fetch(endpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query }),
+  fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res?.errors?.length) {
+        console.error("GraphQL errors:", res.errors);
+      }
+
+      const productos = res?.data?.productos?.nodes || [];
+
+      if (!productos.length) {
+        container.innerHTML = `<p class="text-white">No hay productos disponibles.</p>`;
+        return;
+      }
+
+      productos.forEach((p) => {
+        // ✅ Aquí está la clave: leer el MISMO nombre que en el query
+        const campos = p?.camposparaproducto || {};
+
+        const titulo = campos.titulo || p.title || "Producto";
+        const descripcion = campos.descripcion || "Sin descripción";
+        const precio = campos.precio || "No disponible";
+
+        // Prioriza imagen ACF; si no, usa featuredImage
+        const imgUrl =
+          campos?.imagen?.node?.sourceUrl || p?.featuredImage?.node?.sourceUrl || "";
+        const imgAlt =
+          campos?.imagen?.node?.altText ||
+          p?.featuredImage?.node?.altText ||
+          titulo;
+
+        const col = document.createElement("div");
+        col.className = "col-md-4 mb-4";
+
+        col.innerHTML = `
+          <div class="card bg-dark text-white border-secondary h-100">
+            ${imgUrl ? `<img src="${imgUrl}" class="card-img-top" alt="${imgAlt}">` : ""}
+            <div class="card-body">
+              <h5 class="card-title">${titulo}</h5>
+              <p class="card-text">${descripcion}</p>
+              <p class="card-text fw-bold">$${precio}</p>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(col);
+      });
     })
-        .then((res) => res.json())
-        .then((res) => {
-            const productos = res?.data?.productos?.nodes;
-
-            if (productos && productos.length > 0) {
-                productos.forEach((p) => {
-                    const campos = p.camposParaProducto || {};
-
-                    const col = document.createElement("div");
-                    col.className = "col-md-4 mb-4";
-
-                    col.innerHTML = `
-                        <div class="card bg-dark text-white border-secondary h-100">
-                        ${
-                            p.featuredImage && p.featuredImage.node && p.featuredImage.node.sourceUrl
-                                ? `<img src="${p.featuredImage.node.sourceUrl}" class="card-img-top" alt="${p.featuredImage.node.altText || p.title}">`
-                                : ""
-                        }
-                        <div class="card-body">
-                            <h5 class="card-title">${p.title}</h5>
-                            <p class="card-text">${campos.descripcion || "Sin descripción"}</p>
-                            <p class="card-text fw-bold">$${campos.precio || "No disponible"}</p>
-                            ${
-                                campos.imagen?.node?.sourceUrl
-                                    ? `<img src="${campos.imagen.node.sourceUrl}" alt="${campos.imagen.node.altText || p.title}" class="img-fluid mt-2">`
-                                    : ""
-                            }
-                        </div>
-                        </div>
-                    `;
-                    container.appendChild(col);
-                });
-            } else {
-                container.innerHTML = `<p class="text-white">No hay productos disponibles.</p>`;
-            }
-        })
-        .catch((err) => {
-            console.error("Error al obtener productos:", err);
-            container.innerHTML = `<p class="text-danger">Ocurrió un error al cargar los productos.</p>`;
-        });
-
-    // Integración de jQuery para obtener el token desde jwt.php
-    jQuery(function ($) {
-        $.ajax({
-            url: "http://localhost/noir-aura/wordpress/wp-content/themes/noir-theme/assets/inc/jwt.php",
-            method: "GET",
-            dataType: "json",
-            success: function (res) {
-                if (res.token) {
-                    console.log("Token recibido:", res.token);
-
-                    // Ejemplo de uso del token para una solicitud protegida
-                    fetch(endpoint, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${res.token}`,
-                        },
-                        body: JSON.stringify({ query }),
-                    })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            console.log("Datos protegidos recibidos:", data);
-                        })
-                        .catch((err) => {
-                            console.error("Error al realizar la solicitud protegida:", err);
-                        });
-                } else {
-                    console.error("No se recibió token:", res);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error en la solicitud:", error);
-            },
-        });
+    .catch((err) => {
+      console.error("Error al obtener productos:", err);
+      container.innerHTML = `<p class="text-danger">Ocurrió un error al cargar los productos.</p>`;
     });
 });
